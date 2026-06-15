@@ -85,14 +85,28 @@ export default function HeroSection() {
       <Header />
 
       {/* Subtle background studio light gradients */}
-      <div className="absolute top-0 right-[-10%] w-[60%] h-[70%] bg-blue-100/35 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[60%] bg-slate-200/40 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-0 right-[-10%] w-[60%] h-[70%] bg-blue-100/35 rounded-full blur-[140px] pointer-events-none z-10" />
+      <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[60%] bg-slate-200/40 rounded-full blur-[120px] pointer-events-none z-10" />
 
-      {/* Main Grid Content */}
-      <div className="hero-layout flex-grow max-w-7xl w-full mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center py-8 z-10">
+      {/* Video Stage: Direct absolute child of the hero container (full background) */}
+      <div className="hero-video-stage absolute inset-0 w-full h-full z-0 pointer-events-none">
+        <video
+          ref={videoRef}
+          src="/assets/tv/page-video-scrolly-instance.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          className="hero-scrolly-video w-full h-full object-cover object-center lg:object-right"
+        />
+      </div>
+
+      {/* Main Grid Content Layout */}
+      <div className="hero-layout flex-grow max-w-7xl w-full mx-auto px-6 md:px-12 relative flex items-center justify-start z-20 py-8">
         
         {/* Left Column: SaaS Typography & Copy */}
-        <div className="hero-copy lg:col-span-6 flex flex-col items-start text-left space-y-6 md:space-y-8">
+        <div className="hero-copy w-full lg:w-5/12 flex flex-col items-start text-left space-y-6 md:space-y-8 z-30 relative pointer-events-auto">
           
           {/* Eyebrow Badge */}
           <div className="inline-flex items-center space-x-2 bg-blue-50 border border-blue-100/80 px-3 py-1 rounded-full text-blue-600 text-xs font-bold select-none">
@@ -155,22 +169,6 @@ export default function HeroSection() {
 
         </div>
 
-        {/* Right Column: Visual Stage (Raw MP4 scrollytelling video centerpiece only) */}
-        <div className="hero-video-stage lg:col-span-6 w-full flex items-center justify-center relative">
-          
-          <video
-            ref={videoRef}
-            src="/assets/tv/page-video-scrolly-instance.mp4"
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
-            className="hero-scrolly-video w-full max-w-[760px] aspect-video object-contain rounded-2xl z-20"
-          />
-
-        </div>
-
       </div>
 
       {/* Floating Bottom Trust Bar */}
@@ -180,3 +178,5 @@ export default function HeroSection() {
     </section>
   )
 }
+
+
