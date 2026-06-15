@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef } from 'react'
-import { ArrowRight, Monitor, Globe, RotateCw } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import Header from './Header'
 import TrustBar from './TrustBar'
 import { gsap } from 'gsap'
@@ -35,41 +35,24 @@ export default function HeroSection() {
     const setupScrollTimeline = () => {
       const duration = video.duration || 1
 
-      // Main pin scrolltrigger for the hero container that also scrubs video currentTime
-      ScrollTrigger.create({
-        trigger: containerRef.current,
-        start: 'top top',
-        end: '+=1200',
-        pin: true,
-        pinSpacing: true,
-        anticipatePin: 1,
-        scrub: 0.1,
-        onUpdate: (self) => {
-          // Safely set currentTime to match scroll progress
-          video.currentTime = self.progress * duration
-        }
-      })
-
-      // Timeline to scrub and fade cards and scale video
+      // Single timeline that handles pinning, scrubbing, and scaling
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: containerRef.current,
           start: 'top top',
           end: '+=1200',
+          pin: true,
+          pinSpacing: true,
+          anticipatePin: 1,
           scrub: 0.1,
+          onUpdate: (self) => {
+            // Safely set currentTime to match scroll progress
+            video.currentTime = self.progress * duration
+          }
         }
       })
 
-      // Fade out the floating UI cards quickly
-      tl.to('.hero-floating-card', {
-        opacity: 0,
-        scale: 0.85,
-        stagger: 0.05,
-        ease: 'power1.out',
-        duration: 0.4,
-      }, 0)
-
-      // Subtly scale and fade video as it approaches release
+      // Subtly scale video as it approaches release
       tl.fromTo(video,
         { scale: 0.96 },
         { 
@@ -172,7 +155,7 @@ export default function HeroSection() {
 
         </div>
 
-        {/* Right Column: Visual Stage (Raw MP4 scrollytelling video centerpiece) */}
+        {/* Right Column: Visual Stage (Raw MP4 scrollytelling video centerpiece only) */}
         <div className="hero-video-stage lg:col-span-6 w-full flex items-center justify-center relative">
           
           <video
@@ -183,52 +166,8 @@ export default function HeroSection() {
             loop
             playsInline
             preload="auto"
-            className="hero-scrolly-video w-full h-auto aspect-video object-contain rounded-[28px] shadow-2xl border border-white/70 bg-white z-20"
+            className="hero-scrolly-video w-full max-w-[760px] aspect-video object-contain rounded-2xl z-20"
           />
-
-          {/* Card 1: Top-Right (200+ Channels) */}
-          <div className="hero-floating-card absolute -top-4 -right-4 bg-white/95 backdrop-blur border border-slate-100 rounded-xl p-3 shadow-md hidden sm:flex items-center space-x-2.5 z-30 pointer-events-auto hover:translate-y-[-2px] transition-transform duration-300">
-            <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
-              <Monitor className="w-4.5 h-4.5" />
-            </div>
-            <div>
-              <h5 className="text-xs font-bold text-slate-900 leading-tight">200+ Channels</h5>
-              <p className="text-[10px] text-slate-400 font-medium leading-none mt-0.5">Live & global</p>
-            </div>
-          </div>
-
-          {/* Card 2: Middle-Left (4K Ready) */}
-          <div className="hero-floating-card absolute top-[40%] -left-12 bg-white/95 backdrop-blur border border-slate-100 rounded-xl p-3 shadow-md hidden sm:flex items-center space-x-2.5 z-30 pointer-events-auto hover:translate-y-[-2px] transition-transform duration-300">
-            <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 font-black text-[10px]">
-              4K
-            </div>
-            <div>
-              <h5 className="text-xs font-bold text-slate-900 leading-tight">4K Ready</h5>
-              <p className="text-[10px] text-slate-400 font-medium leading-none mt-0.5">Crisp & clear</p>
-            </div>
-          </div>
-
-          {/* Card 3: Middle-Right (Works Everywhere) */}
-          <div className="hero-floating-card absolute top-[30%] -right-16 bg-white/95 backdrop-blur border border-slate-100 rounded-xl p-3 shadow-md hidden sm:flex items-center space-x-2.5 z-30 pointer-events-auto hover:translate-y-[-2px] transition-transform duration-300">
-            <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
-              <Globe className="w-4.5 h-4.5" />
-            </div>
-            <div>
-              <h5 className="text-xs font-bold text-slate-900 leading-tight">Works Everywhere</h5>
-              <p className="text-[10px] text-slate-400 font-medium leading-none mt-0.5">Phone, tablet, TV, web</p>
-            </div>
-          </div>
-
-          {/* Card 4: Bottom-Right (Updated Daily) */}
-          <div className="hero-floating-card absolute -bottom-4 -right-4 bg-white/95 backdrop-blur border border-slate-100 rounded-xl p-3 shadow-md hidden sm:flex items-center space-x-2.5 z-30 pointer-events-auto hover:translate-y-[-2px] transition-transform duration-300">
-            <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
-              <RotateCw className="w-4.5 h-4.5 animate-[spin_8s_linear_infinite]" />
-            </div>
-            <div>
-              <h5 className="text-xs font-bold text-slate-900 leading-tight">Updated Daily</h5>
-              <p className="text-[10px] text-slate-400 font-medium leading-none mt-0.5">New channels regularly</p>
-            </div>
-          </div>
 
         </div>
 
@@ -238,8 +177,6 @@ export default function HeroSection() {
       <div className="w-full max-w-7xl mx-auto px-6 md:px-12 pb-6 z-20">
         <TrustBar />
       </div>
-      
     </section>
   )
 }
-
