@@ -35,42 +35,48 @@ export default function HeroSection() {
     const setupScrollTimeline = () => {
       const duration = video.duration || 1
 
-      // Single timeline that handles pinning, scrubbing, and scaling
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: 'top top',
-          end: '+=1200',
-          pin: true,
-          pinSpacing: true,
-          anticipatePin: 1,
-          scrub: 0.1,
-          onUpdate: (self) => {
-            // Safely set currentTime to match scroll progress
-            video.currentTime = self.progress * duration
+      // Single ScrollTrigger that handles pinning, currentTime scrubbing, and scaling.
+      // This avoids offset calculation conflicts between multiple triggers on the same element.
+      const trigger = ScrollTrigger.create({
+        trigger: containerRef.current,
+        start: 'top top',
+        end: '+=1200',
+        pin: true,
+        pinSpacing: true,
+        anticipatePin: 1,
+        scrub: 0.1,
+        onUpdate: (self) => {
+          const progress = self.progress
+          
+          // 1. Scrub video currentTime safely to prevent decoder choking
+          if (!video.seeking) {
+            video.currentTime = progress * duration
           }
+
+          // 2. Subtly scale the video from 0.96 to 1.04 based on progress
+          const scaleVal = 0.96 + progress * 0.08
+          gsap.set(video, { scale: scaleVal })
         }
       })
 
-      // Subtly scale video as it approaches release
-      tl.fromTo(video,
-        { scale: 0.96 },
-        { 
-          scale: 1.04,
-          ease: 'power1.inOut',
-          duration: 1,
-        },
-        0
-      )
+      return () => {
+        trigger.kill()
+      }
     }
 
     // Safely wait for metadata if not loaded yet
     if (video.readyState >= 1) {
-      setupScrollTimeline()
+      const cleanup = setupScrollTimeline()
+      return cleanup
     } else {
-      video.addEventListener('loadedmetadata', setupScrollTimeline)
+      let cleanupFn: (() => void) | undefined
+      const onMetadata = () => {
+        cleanupFn = setupScrollTimeline()
+      }
+      video.addEventListener('loadedmetadata', onMetadata)
       return () => {
-        video.removeEventListener('loadedmetadata', setupScrollTimeline)
+        video.removeEventListener('loadedmetadata', onMetadata)
+        if (cleanupFn) cleanupFn()
       }
     }
   }, { scope: containerRef })
