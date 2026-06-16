@@ -33,34 +33,45 @@ export default function HeroSection() {
     video.pause()
 
     const setupScrollTimeline = () => {
-      const duration = video.duration || 1
+      const duration = video.duration || 10.1
 
-      // Single ScrollTrigger that handles pinning, currentTime scrubbing, and scaling.
-      // This avoids offset calculation conflicts between multiple triggers on the same element.
-      const trigger = ScrollTrigger.create({
-        trigger: containerRef.current,
-        start: 'top top',
-        end: '+=1200',
-        pin: true,
-        pinSpacing: true,
-        anticipatePin: 1,
-        scrub: 0.1,
-        onUpdate: (self) => {
-          const progress = self.progress
-          
-          // 1. Scrub video currentTime safely to prevent decoder choking
-          if (!video.seeking) {
-            video.currentTime = progress * duration
-          }
+      // Ensure video is paused and starts at 0
+      video.pause()
+      video.currentTime = 0
 
-          // 2. Subtly scale the video from 0.96 to 1.04 based on progress
-          const scaleVal = 0.96 + progress * 0.08
-          gsap.set(video, { scale: scaleVal })
+      // Single ScrollTrigger timeline to pin the hero and scrub both currentTime and scale
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: 'top top',
+          end: '+=1200',
+          pin: true,
+          pinSpacing: true,
+          anticipatePin: 1,
+          scrub: 0.1,
         }
       })
 
+      // Tween currentTime smoothly across scroll progress
+      tl.to(video, {
+        currentTime: duration,
+        ease: 'none',
+        duration: duration,
+      }, 0)
+
+      // Tween scale smoothly in parallel
+      tl.fromTo(video, 
+        { scale: 0.96 },
+        { 
+          scale: 1.04,
+          ease: 'none',
+          duration: duration,
+        }, 
+        0
+      )
+
       return () => {
-        trigger.kill()
+        tl.kill()
       }
     }
 
