@@ -109,7 +109,7 @@ export default function HeroSection() {
       <div className="hero-video-stage absolute inset-0 w-full h-full z-0 pointer-events-none">
         <video
           ref={videoRef}
-          src="/assets/tv/page-video-scrolly-instance.mp4"
+          src="/assets/tv/page-video-scrolly-scrub.mp4"
           autoPlay
           muted
           loop
